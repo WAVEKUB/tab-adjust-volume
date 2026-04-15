@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 200px;
+            padding: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+        }
+
+        h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type=range] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        #volumeValue {
+            font-weight: bold;
+            color: #ff3e00;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>ระดับเสียง Tab นี้</h3>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+    <div id="volumeValue">100%</div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
