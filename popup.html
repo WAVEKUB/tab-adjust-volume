@@ -4,35 +4,300 @@
 <head>
     <meta charset="utf-8">
     <style>
+        :root {
+            --modal-open-dur: 250ms;
+            --modal-scale: 0.96;
+            --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+            --bg: #f6f7f9;
+            --surface: #ffffff;
+            --ink: #171a1f;
+            --muted: #68707d;
+            --line: #dfe3e8;
+            --accent: #ff5a1f;
+            --accent-strong: #d93f0b;
+            --good: #087f5b;
+            --track: #e7ebf0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            width: 200px;
-            padding: 15px;
+            width: 320px;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+            transform-origin: top center;
+            animation: popupDialogEnter var(--modal-open-dur) var(--modal-ease) both;
+            will-change: opacity, transform;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .popup-shell {
+            display: grid;
+            gap: 14px;
+            padding: 16px;
+            background: var(--surface);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .eyebrow {
+            margin: 0 0 3px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .volume-readout {
+            min-width: 74px;
+            padding: 7px 9px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff7f3;
+            color: var(--accent-strong);
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1;
             text-align: center;
         }
 
-        h3 {
-            margin-top: 0;
-            font-size: 16px;
-            color: #333;
+        .site-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 9px 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fafbfc;
+        }
+
+        .site-icon {
+            display: grid;
+            flex: 0 0 24px;
+            width: 24px;
+            height: 24px;
+            place-items: center;
+            border-radius: 50%;
+            background: #e9f7f2;
+            color: var(--good);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .site-copy {
+            min-width: 0;
+        }
+
+        .site-label {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.2;
+        }
+
+        .site-host {
+            margin: 1px 0 0;
+            overflow: hidden;
+            font-size: 13px;
+            font-weight: 650;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .control-group {
+            display: grid;
+            gap: 10px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            color: var(--muted);
+            font-size: 12px;
         }
 
         input[type=range] {
+            --slider-fill: 100%;
+            height: 28px;
             width: 100%;
-            margin: 10px 0;
+            margin: 0;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
         }
 
-        #volumeValue {
-            font-weight: bold;
-            color: #ff3e00;
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent) 0 var(--slider-fill), var(--track) var(--slider-fill) 100%);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            width: 22px;
+            height: 22px;
+            margin-top: -7px;
+            appearance: none;
+            border: 3px solid var(--surface);
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 2px 8px rgba(23, 26, 31, 0.24);
+        }
+
+        input[type=range]:focus-visible {
+            outline: 3px solid rgba(255, 90, 31, 0.24);
+            outline-offset: 4px;
+        }
+
+        input[type=range]:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .preset-button,
+        .reset-button {
+            min-height: 34px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .preset-button:hover,
+        .reset-button:hover {
+            border-color: var(--accent);
+            color: var(--accent-strong);
+        }
+
+        .preset-button:focus-visible,
+        .reset-button:focus-visible {
+            outline: 3px solid rgba(255, 90, 31, 0.24);
+            outline-offset: 2px;
+        }
+
+        .preset-button.is-active {
+            border-color: var(--accent);
+            background: #fff0e9;
+            color: var(--accent-strong);
+        }
+
+        .reset-button {
+            width: 100%;
+            background: #f8fafc;
+        }
+
+        .status-text {
+            min-height: 18px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        body.is-disabled .site-icon {
+            background: #f1f3f5;
+            color: var(--muted);
+        }
+
+        body.is-disabled .volume-readout {
+            background: #f8fafc;
+            color: var(--muted);
+        }
+
+        body.is-disabled .preset-button,
+        body.is-disabled .reset-button {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        @keyframes popupDialogEnter {
+            from {
+                opacity: 0;
+                transform: translateY(-2px) scale(var(--modal-scale));
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+                will-change: auto;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h3>ระดับเสียง Tab นี้</h3>
-    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
-    <div id="volumeValue">100%</div>
+    <main class="popup-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Tab Volume</p>
+                <h1>ระดับเสียงแท็บ</h1>
+            </div>
+            <output class="volume-readout" id="volumeValue" for="volumeSlider" aria-live="polite">100%</output>
+        </header>
+
+        <section class="site-row" aria-label="Current site">
+            <div class="site-icon" id="siteIcon" aria-hidden="true">T</div>
+            <div class="site-copy">
+                <p class="site-label">บันทึกตามเว็บไซต์</p>
+                <p class="site-host" id="siteHost">กำลังโหลด...</p>
+            </div>
+        </section>
+
+        <section class="control-group" aria-label="Volume controls">
+            <div class="slider-labels" aria-hidden="true">
+                <span>0%</span>
+                <span>100%</span>
+            </div>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" aria-label="Tab volume">
+            <div class="preset-grid" aria-label="Quick volume presets">
+                <button class="preset-button" type="button" data-volume="0">0%</button>
+                <button class="preset-button" type="button" data-volume="0.25">25%</button>
+                <button class="preset-button" type="button" data-volume="0.5">50%</button>
+                <button class="preset-button" type="button" data-volume="0.75">75%</button>
+                <button class="preset-button" type="button" data-volume="1">100%</button>
+            </div>
+            <button class="reset-button" id="resetButton" type="button">รีเซ็ตเป็น 100%</button>
+        </section>
+
+        <p class="status-text" id="statusText" role="status">พร้อมใช้งาน</p>
+    </main>
 
     <script src="popup.js"></script>
 </body>
