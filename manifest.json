@@ -1,18 +1,13 @@
 {
-    "manifest_version": 3,
-    "name": "Tab Volume Controller",
-    "version": "1.2",
-    "description": "ปรับระดับเสียงแยกแต่ละ Tab",
-    "permissions": [
-        "activeTab",
-        "scripting",
-        "storage",
-        "tabs"
-    ],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "action": {
-        "default_popup": "popup.html"
-    }
+  "manifest_version": 3,
+  "name": "Tab Volume Controller",
+  "version": "1.2",
+  "description": "Adjust volume each Tab",
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
 }

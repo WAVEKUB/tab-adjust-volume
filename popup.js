@@ -25,7 +25,7 @@ function setStatus(message) {
     statusText.innerText = message;
 }
 
-// ฟังก์ชันสำหรับอัปเดตตัวเลขหน้าตา UI
+// update UI
 function updateUI(volume) {
     let normalizedVolume = clampVolume(volume);
     let percent = formatVolume(normalizedVolume);
@@ -126,10 +126,10 @@ async function processVolumeQueue() {
             });
 
             if (pendingVolume === null) {
-                setStatus('ปรับและบันทึกสำหรับเว็บไซต์นี้แล้ว');
+                setStatus('volume set to ' + formatVolume(volumeToApply));
             }
         } catch (e) {
-            setStatus('Chrome ไม่อนุญาตให้ปรับเสียงบนหน้านี้');
+            setStatus('Chrome is blocking the volume change on this page. Please allow the extension to run on this site.');
             pendingVolume = null;
         }
     }
@@ -157,9 +157,9 @@ async function resetVolume() {
             func: applyVolumeToPage,
             args: [1]
         });
-        setStatus('รีเซ็ตเป็นค่าเริ่มต้น 100% แล้ว');
+        setStatus('Reset to default 100%');
     } catch (e) {
-        setStatus('รีเซ็ตค่าแล้ว แต่ปรับเสียงบนหน้านี้ไม่ได้');
+        setStatus('Volume reset but failed to adjust on this page');
     }
 }
 
@@ -174,7 +174,7 @@ async function initializePopup() {
         siteHost.innerText = 'หน้านี้ไม่รองรับ';
         updateUI(1);
         setControlsDisabled(true);
-        setStatus('ใช้ได้กับหน้าเว็บ http และ https เท่านั้น');
+        setStatus('Use with http and https web pages only');
         return;
     }
 
@@ -184,10 +184,10 @@ async function initializePopup() {
 
     let savedVolume = await getStoredVolume(storageKey);
     updateUI(savedVolume === undefined ? 1 : savedVolume);
-    setStatus(savedVolume === undefined ? 'ยังไม่มีค่าที่บันทึกไว้สำหรับเว็บไซต์นี้' : 'โหลดค่าที่บันทึกไว้แล้ว');
+    setStatus(savedVolume === undefined ? 'No saved value for this site' : 'Loaded saved value');
 }
 
-// ฟังก์ชันนี้จะถูกฉีดไปรันบนหน้าเว็บ
+// This function will be injected and run on the webpage
 function applyVolumeToPage(volume) {
     window.__extensionVolume = volume;
     document.querySelectorAll('video, audio').forEach(media => {
@@ -207,7 +207,7 @@ function applyVolumeToPage(volume) {
 // 1. When popup opens, load the saved volume for this site (by hostname)
 initializePopup();
 
-// 2. เมื่อผู้ใช้เลื่อนสไลเดอร์ปรับเสียง
+// 2. When user changes the slider or clicks a preset button, save and apply the new volume to the page
 slider.addEventListener('input', (e) => {
     requestApplyVolume(parseFloat(e.target.value));
 });
